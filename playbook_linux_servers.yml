@@ -1,0 +1,26 @@
+---
+- hosts: Linux
+  become: yes
+  vars:
+    document_root: /var/www
+    ansible_user: "ubuntu"
+    ansible_ssh_private_key_file: 'chave_privada_pem'
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  tasks:
+    - name: Update apt cache and install Nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+
+    - name: Copy website files to the server's document root
+      template:
+        src: files/index.html
+        dest: /var/www/html/
+      notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
