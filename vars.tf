@@ -17,3 +17,9 @@ variable "instance_type" {
 variable "key_name" {
   default = "chave_privada_pem"
 }
+
+variable "admin_password" {
+  description = "Administrator password"
+  type        = string
+  sensitive   = true
+}
