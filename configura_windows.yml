@@ -1,0 +1,82 @@
+---
+- name: Config Apache Server
+  hosts: Windows
+  gather_facts: false
+
+  vars:
+    ansible_user: "Administrator"
+    #ansible_password: "" # Será utilizado através da variavel TF_VAR_admin_password no pipeline. 
+    ansible_connection: "winrm"
+    ansible_winrm_transport: "ntlm"
+    ansible_winrm_server_cert_validation: "ignore"
+    ansible_port: '5986'
+    ansible_facts: false
+ 
+  tasks:
+    - name: Create directory
+      ansible.windows.win_file:
+        path: C:\Temp\
+        state: directory
+
+    - name: Download Apache zip.
+      win_get_url:
+        url: https://www.apachelounge.com/download/VS16/binaries/httpd-2.4.53-win64-VS16.zip
+        dest: C:\temp\
+    
+    - name: Run basic PowerShell script extract httpd-2.4.53-win64-VS16.zip
+      ansible.windows.win_powershell:
+        script: |
+          $shell = New-Object -ComObject shell.application
+          $zip = $shell.NameSpace("C:\Temp\httpd-2.4.53-win64-VS16.zip")
+          foreach ($item in $zip.items()) {
+            $shell.Namespace("C:\").CopyHere($item)
+          }
+
+    - name: Download Visual C++ 2015
+      win_get_url:
+        url: https://aka.ms/vs/17/release/vc_redist.x64.exe
+        dest: C:\temp\
+
+    - name: Install Visual C thingy with list of arguments instead of a string
+      win_package:
+        path: c:\temp\vc_redist.x64.exe
+        arguments:
+          - /install
+          - /passive
+          - /norestart       
+    
+    - name: Copy file index.html
+      ansible.windows.win_copy:
+        src: files/index.html
+        dest: C:\Apache24\htdocs\
+    
+    - name: Execute a command in the remote shell to create Apache service
+      ansible.windows.win_shell: C:\Apache24\bin\httpd.exe -k install
+
+    - name: Set Apache service startup mode to auto and ensure it is started
+      win_service:
+        name: Apache2.4
+        start_mode: auto
+        state: restarted
+    
+    - name: Firewall rule to allow WEB on TCP port 80
+      win_firewall_rule:
+        name: Remote Web
+        localport: 80
+        action: allow
+        direction: in
+        protocol: tcp
+        profiles: private
+        state: present
+        enabled: yes
+    
+    - name: Firewall rule to allow WEB HTTPS on TCP port 443
+      win_firewall_rule:
+        name: Remote Web HTTPS
+        localport: 443
+        action: allow
+        direction: in
+        protocol: tcp
+        profiles: private
+        state: present
+        enabled: yes
