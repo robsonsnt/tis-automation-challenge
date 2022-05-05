@@ -1,0 +1,88 @@
+image:
+    name: hashicorp/terraform:light
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+      - 'AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}'
+      - 'AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}'
+      - 'chave_privada_gitlab=${chave_privada_gitlab}'
+cache:
+  paths:
+    - .terraform
+
+before_script:
+  - terraform --version
+  - terraform init
+
+stages:
+  - validate
+  - plan
+  - apply
+  - ansible
+  - destroy
+
+validate:
+  when: on_success
+  stage: validate
+  script:
+    - terraform validate
+  only:
+    - main
+
+plan:
+  when: on_success
+  stage: plan
+  dependencies:
+    - validate
+  script:
+    - terraform plan
+  only:
+    - main
+
+apply:
+  when: manual
+  stage: apply
+  dependencies:
+    - plan
+  script:
+    - terraform apply -auto-approve
+  only:
+    - main
+
+ansible:
+  before_script:
+    - ''
+  when: manual
+  stage: ansible
+  dependencies:
+    - apply
+  image: 
+    name: alpine
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+      - 'AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}'
+      - 'AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}'
+      - 'chave_privada_gitlab=${chave_privada_gitlab}'
+      - 'SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}'
+  variables:
+    ANSIBLE_HOST_KEY_CHEKING: "False"
+  script:
+     - apk add ansible openssh-client py3-pip
+     - python3 -m pip install ansible boto3 pywinrm
+     - eval $(ssh-agent -s)
+     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+     - mkdir -p ~/.ssh
+     - chmod 700  ~/.ssh
+     - ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook playbook_linux_servers.yml -i inventory.aws_ec2.yml -e ansible_ssh_private_key_file='{{ lookup("env", "SSH_PRIVATE_KEY") }}'
+     - ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook configura_windows.yml -i inventory.aws_ec2.yml -e ansible_password='{{ lookup("env", "TF_VAR_admin_password") }}'
+  only:
+    - main
+
+destroy:
+  when: manual
+  stage: destroy
+  script:
+    - terraform destroy -auto-approve
+  only:
+    - main
