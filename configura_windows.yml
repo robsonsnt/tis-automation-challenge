@@ -59,6 +59,24 @@
         start_mode: auto
         state: restarted
     
+    - name: Service Function Discovery Resource Publication
+      win_service:
+        name: Function Discovery Resource Publication
+        start_mode: auto
+        state: restarted
+    
+    - name: Service SSDP Discovery
+      win_service:
+        name: SSDP Discovery
+        start_mode: auto
+        state: restarted
+  
+    - name: Service UPnP Device Host
+      win_service:
+        name: UPnP Device Host
+        start_mode: auto
+        state: restarted
+    
     - name: Firewall rule to allow WEB on TCP port 80
       win_firewall_rule:
         name: Remote Web
