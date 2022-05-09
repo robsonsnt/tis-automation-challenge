@@ -1,5 +1,3 @@
-Readme.md em desenvolvimento...
-
 # TIS Automation Challenge
 
 Projeto consiste em subir uma infra na AWS através de uma pipeline .gitlab-ci.yml onde serão provisionados 4 hosts t2.micro, 2 Linux e 2 Windows utlizando Terraform, em seguida será realizado configuração do Apache nos 2 servidores Windows e NGINX no 2 servidores Linux utilizando Ansible.
@@ -36,19 +34,20 @@ TF_VAR_admin_password | Variable | Senha que será configurada para o usuário A
 
 Após realizar as configurações poderá executar a pipeline através do menu **CI/CD>Pipelines** ou executando um commit na **branch Master**, será iniciado a execução da pipeline que contém os seguintes estágios.
 
-- Validate - Executado automativamente. Realiza a validação dos arquivos do terraform.
-- Plan - Executado automaticamente caso validate ocorra com sucesso. Realiza o plan do terraform e informa um plano detalhado do que será executado.
-- apply - Optei por deixar para ser executado manualmente, porém ele depende do stágio do plan ter sido executado com sucesso, esse estágio realiza a criação do ambiente conforme descrito nos arquivos do terraform.
-- ansible - Realiza o provisionamento configurando os hosts com Ansible.
-- destroy - Está para destruir o ambiente, necessário executar de forma manual.
+- validate - Executado automativamente. Realiza a validação dos arquivos do terraform.
+- plan - Executado automaticamente caso validate ocorra com sucesso. Realiza o plan do terraform e informa um plano detalhado do que será executado.
+- apply - Optei por deixar para ser executado manualmente, porém ele depende do estágio do plan ter sido executado com sucesso, esse estágio realiza a criação do ambiente conforme descrito nos arquivos do terraform.
+- ansible - Realiza o provisionamento configurando os hosts com Ansible, este passo também está como manual.
+- destroy - Estagio que realiza o destroy do ambiente removendo todos os recursos criados. Estágio deve ser executado de forma manual quando desejar destruir o ambiente.
 
 # Desafios encontrados
 
  - Criação da API a qual ainda não foi concluída porém estou desenvolvendo.
- - Configuração do WinRM (Windows Remote Management), porém o obstáculo foi superado no qual a própria documentação do Ansible informa como realizar as configurações necessárias.
+ - Configuração do WinRM (Windows Remote Management), porém o obstáculo foi superado utilizando o `user_date` para executar script powershell, disponibilizado na documentação do Ansible, durante a criação dos hosts Windows.
  
 
 # Melhorias que podem ser realizadas
 
 - Podemos realizar melhorias no código do terraform com utilização de modulos o que facilitaria inclusive a reutilização do código em novos projetos.
 - Criação de novos recursos que poderiam trazer melhorias e mais robustes para nossa infra como Virtual Private Cloud, Subnet, Internet Gateway, tabela de roteamento, etc...
+- 
