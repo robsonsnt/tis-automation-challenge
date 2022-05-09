@@ -4,6 +4,8 @@ Readme.md em desenvolvimento...
 
 Projeto consiste em subir uma infra na AWS através de uma pipeline .gitlab-ci.yml onde serão provisionados 4 hosts t2.micro, 2 Linux e 2 Windows utlizando Terraform, em seguida será realizado configuração do Apache nos 2 servidores Windows e NGINX no 2 servidores Linux utilizando Ansible.
 
+Obseração: Trata-se da implementação do desafio: [TIS-Automation-Challenge](https://github.com/stone-payments/tis-automation-challenge).
+
 # O que é necessário para executar a Pipeline ?
 
 - **Conta na AWS** - No caso a princípio o projeto só utiliza recursos da Freetier.
@@ -29,3 +31,24 @@ AWS_SECRET_ACCESS_KEY | Variable | Secret gerada para o usuário criado na AWS e
 chave_privada_gitlab | File | Conteudo do arquivo de chave privada PEM gerado
 SSH_PRIVATE_KEY | Variable | Conteudo do arquivo de chave privada PEM gerado
 TF_VAR_admin_password | Variable | Senha que será configurada para o usuário Administrator do servidores Windows
+
+# Executando a Pipeline
+
+Após realizar as configurações poderá executar a pipeline através do menu **CI/CD>Pipelines** ou executando um commit na **branch Master**, será iniciado a execução da pipeline que contém os seguintes estágios.
+
+Validate - Executado automativamente. Realiza a validação dos arquivos do terraform.
+Plan - Executado automaticamente caso validate ocorra com sucesso. Realiza o plan do terraform e informa um plano detalhado do que será executado.
+apply - Optei por deixar para ser executado manualmente, porém ele depende do stágio do plan ter sido executado com sucesso, esse estágio realiza a criação do ambiente conforme descrito nos arquivos do terraform.
+ansible - Realiza o provisionamento configurando os hosts com Ansible.
+destroy - Está para destruir o ambiente, necessário executar de forma manual.
+
+# Desafios encontrados
+
+ - Criação da API a qual ainda não foi concluída porém estou desenvolvendo.
+ - Configuração do WinRM (Windows Remote Management), porém o obstáculo foi superado no qual a própria documentação do Ansible informa como realizar as configurações necessárias.
+ 
+
+# Melhorias que podem ser realizadas
+
+- Podemos realizar melhorias no código do terraform com utilização de modulos o que facilitaria inclusive a reutilização do código em novos projetos.
+- Criação de novos recursos que poderiam trazer melhorias e mais robustes para nossa infra como Virtual Private Cloud, Subnet, Internet Gateway, tabela de roteamento, etc...
