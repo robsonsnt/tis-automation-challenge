@@ -36,11 +36,11 @@ TF_VAR_admin_password | Variable | Senha que será configurada para o usuário A
 
 Após realizar as configurações poderá executar a pipeline através do menu **CI/CD>Pipelines** ou executando um commit na **branch Master**, será iniciado a execução da pipeline que contém os seguintes estágios.
 
-Validate - Executado automativamente. Realiza a validação dos arquivos do terraform.
-Plan - Executado automaticamente caso validate ocorra com sucesso. Realiza o plan do terraform e informa um plano detalhado do que será executado.
-apply - Optei por deixar para ser executado manualmente, porém ele depende do stágio do plan ter sido executado com sucesso, esse estágio realiza a criação do ambiente conforme descrito nos arquivos do terraform.
-ansible - Realiza o provisionamento configurando os hosts com Ansible.
-destroy - Está para destruir o ambiente, necessário executar de forma manual.
+- Validate - Executado automativamente. Realiza a validação dos arquivos do terraform.
+- Plan - Executado automaticamente caso validate ocorra com sucesso. Realiza o plan do terraform e informa um plano detalhado do que será executado.
+- apply - Optei por deixar para ser executado manualmente, porém ele depende do stágio do plan ter sido executado com sucesso, esse estágio realiza a criação do ambiente conforme descrito nos arquivos do terraform.
+- ansible - Realiza o provisionamento configurando os hosts com Ansible.
+- destroy - Está para destruir o ambiente, necessário executar de forma manual.
 
 # Desafios encontrados
 
