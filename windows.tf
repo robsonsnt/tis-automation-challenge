@@ -1,6 +1,6 @@
 resource "aws_instance" "windows" {
   ami = "ami-08ed5c5dd62794ec0"
-  count         = 1
+  count         = 2
   instance_type = var.instance_type
   key_name      = var.key_name
   get_password_data = "true"

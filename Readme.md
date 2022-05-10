@@ -42,12 +42,15 @@ Após realizar as configurações poderá executar a pipeline através do menu *
 
 # Desafios encontrados
 
- - Criação da API a qual ainda não foi concluída porém estou desenvolvendo.
- - Configuração do WinRM (Windows Remote Management), porém o obstáculo foi superado utilizando o `user_date` para executar script powershell, disponibilizado na documentação do Ansible, durante a criação dos hosts Windows.
+ - Criação da API foi criada uma versão inicial, porém ainda não foi concluída a integração da mesma no pipeline conforme descrito na sessão API.
+ - Configuração do WinRM (Windows Remote Management), porém o obstáculo foi superado utilizando o `user_data` para executar script powershell, disponibilizado na documentação do Ansible, durante a criação dos hosts Windows.
  
 
 # Melhorias que podem ser realizadas
 
 - Podemos realizar melhorias no código do terraform com utilização de modulos o que facilitaria inclusive a reutilização do código em novos projetos.
 - Criação de novos recursos que poderiam trazer melhorias e mais robustes para nossa infra como Virtual Private Cloud, Subnet, Internet Gateway, tabela de roteamento, etc...
-- 
+
+# API 
+Foi realizada a criação de uma versão inicial da API, porém ainda não foi realizada a integração no pipeline para realização de deploy e provisionamento da mesma.
+Caso deseje realizar testes da mesma rodando localmente poderá realizar criando um virtualenv com python e instalando os requirements conforme arquivo `api/api/requirements.txt` em seguida executando o comando `python manage.py runserver` foi utilizado o **Python 3.8.10**, estando em execução poderá realizar testes acessando o endpoint `http://localhost:8000` ou `http://localhost:8000/textos/`.
