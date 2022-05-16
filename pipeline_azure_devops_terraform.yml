@@ -1,0 +1,31 @@
+trigger:
+- none
+
+parameters:
+  - name: workingDirectory
+    type: string
+    default: "$(Build.SourcesDirectory)/infra_basica"
+
+  - name: Action
+    displayName: Action
+    type: string
+    default: 'Apply'
+    values:
+    - Apply
+    - Destroy
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: terraform_install  
+  displayName: Terraform Install
+  jobs:
+  - job: install
+    steps:
+    - script: |
+        sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get update && sudo apt-get install terraform
+        terraform --version
