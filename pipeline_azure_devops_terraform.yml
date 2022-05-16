@@ -29,3 +29,38 @@ stages:
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
         sudo apt-get update && sudo apt-get install terraform
         terraform --version
+
+- stage: terraform_init  
+  displayName: Terraform Init and Validate
+  dependsOn: terraform_install
+  condition: and(succeeded('terraform_install'), ne('${{ parameters.Action }}', 'Destroy'))
+  jobs:
+  - job: Init
+    steps:
+    - task: CmdLine@2
+      inputs:
+        workingDirectory: '${{ parameters.workingDirectory }}'
+        script: |
+          export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+          export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
+          terraform --version
+          terraform init
+          terraform validate
+
+- stage: terraform_plan  
+  displayName: Terraform Plan
+  dependsOn: terraform_init
+  condition: and(succeeded('terraform_init'), ne('${{ parameters.Action }}', 'Destroy'))
+  jobs:
+  - job: Plan
+    steps:
+    - task: CmdLine@2
+      inputs:
+        workingDirectory: '${{ parameters.workingDirectory }}'
+        script: |
+          export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+          export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
+          terraform --version
+          terraform init
+          terraform plan
+
