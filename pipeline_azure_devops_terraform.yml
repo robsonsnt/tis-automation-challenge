@@ -81,6 +81,31 @@ stages:
           terraform init
           terraform apply -auto-approve
 
+- stage: ansible
+  displayName: Ansible
+  condition: and(succeeded('terraform_plan'), ne('${{ parameters.Action }}', 'Destroy'), eq('${{ parameters.Action }}', 'Apply'))
+  jobs:
+  - job: Ansivle_Playbook
+    steps:
+    - task: Bash@3     
+      inputs:
+        workingDirectory: '${{ parameters.workingDirectory }}'
+        targetType: inline  
+        script: | 
+          export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) 
+          export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
+          export ANSIBLE_HOST_KEY_CHECKING="False"
+          export SSH_KEY=$(cat /home/vsts/work/_temp/chave_privada_gitlab) > /dev/null
+          eval $(ssh-agent -s)
+          ssh-add /home/vsts/work/_temp/chave_privada_gitlab
+          echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null
+          sudo apt-get update -y
+          sudo apt-get install python3 -y
+          python3 -m venv .venv && source .venv/bin/activate
+          python3 -m pip install ansible boto3 pywinrm
+          ansible --version
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory.aws_ec2.yml playbook_linux_servers.yml -e ansible_ssh_private_key_file='{{ lookup("env", "SSH_KEY") }}' -v
+
 - stage: terraform_destroy 
   displayName: Terraform Destroy
   dependsOn: terraform_install
