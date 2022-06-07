@@ -4,7 +4,7 @@ trigger:
 parameters:
   - name: workingDirectory
     type: string
-    default: "$(Build.SourcesDirectory)/infra_basica"
+    default: "$(Build.SourcesDirectory)"
 
   - name: Action
     displayName: Action
